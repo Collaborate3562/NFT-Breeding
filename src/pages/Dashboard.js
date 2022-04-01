@@ -8,6 +8,7 @@ import { Container, Typography, Stack, TextField, Grid, Button, Divider } from '
 //
 import { varFadeInUp, varFadeInRight } from '../components/animate';
 import { useAppContext } from "../contexts/AppContext";
+import { useSnackbar } from "notistack";
 
 // ----------------------------------------------------------------------
 
@@ -51,8 +52,10 @@ export default function Dashboard() {
   const [totalNewNFTSold, setTotalNewNFTSold] = useState(0);
   const [earnedFromNewNFT, setEarnedFromNewNFT] = useState(0);
   const [reselledAmount, setReselledAmount] = useState(0);
+  const [url, setUrl] = useState("");
 
   const context = useAppContext();
+  const { enqueueSnackbar } = useSnackbar();
   
   const navigate = useNavigate();
   const adminAddress = process.env.REACT_APP_DAVIDE_WALLET;
@@ -81,6 +84,23 @@ export default function Dashboard() {
       init();
     }
   }, [])
+
+  const handleChangeUrl = async() => {
+    console.log('handleChangeurl');
+    if(url === "") {
+      enqueueSnackbar("Please insert Url.", {
+        variant: "error"
+      })
+    }
+
+    const nftContract = context.NFTContract;
+
+    await nftContract.methods.setVideoUrl(url).send({from: context.walletAddress});
+    enqueueSnackbar("Video URI successfully changed.", {
+      variant: "success",
+    });
+  }
+
   return (
     <>
       {walletConnected && adminAddress === account &&
@@ -151,20 +171,24 @@ export default function Dashboard() {
                   alignItems="center"
                   sx={{ textAlign: { xs: 'center', md: 'left' }, border: "2px solid #7414f5", borderRadius: '10px' }}
                 >
-                  <Grid item xs={12} md={6} sx={{ borderRight: "1px solid #7414f5" }}>
+                  <Grid item xs={12} md={5} sx={{ borderRight: "1px solid #7414f5" }}>
                     <Typography sx={{ color: 'common.white', fontFamily: 'Montserrat', textAlign: 'center', fontWeight: 'bold' }}>
                       LINK FOR VIDEO TUTORIAL
                     </Typography>
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={12} md={5}>
                     <TextField
                       sx={{ fontFamily: 'MontserratItalic', textAlign: 'center', color: "#7414f5", mt: 0 }}
                       label="Paste here..."
                       type="search"
                       fullWidth
                       variant="standard"
+                      onChange={(e) => {setUrl(e.target.value)}}
                     />
+                  </Grid>
+                  <Grid item xs={12} md={2} sx={{textAlign: 'center'}}>
+                    <Button variant="contained" sx={{ border: '1px solid black' }} onClick={handleChangeUrl}>CHANGE URL</Button>
                   </Grid>
                 </Grid>
               </motion.div>

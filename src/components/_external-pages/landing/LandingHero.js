@@ -2,8 +2,10 @@ import { motion } from 'framer-motion';
 // material
 import { styled } from '@mui/material/styles';
 import { Button, Container, Typography, Stack, Divider, Grid } from '@mui/material';
+import threeDImage from "../../../assets/images/3D_CARD.gif";
 //
 import { varWrapEnter, varFadeInUp, varFadeIn } from '../../animate';
+import ReactPlayer from 'react-player'
 
 // ----------------------------------------------------------------------
 
@@ -93,7 +95,8 @@ export default function LandingHero() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <motion.div variants={varFadeInUp}>
-                  <img src='/img/home/3d_card.png' alt='3d-card' />
+                  <img src={threeDImage} alt="3DCard" style={{ width: '306px', height: '300px' }} />
+                  {/* <audio src={threeDImage} alt='3d-card' /> */}
                   <Typography sx={{ color: 'common.white', fontFamily: 'MontserratItalic' }}>
                     Join with Our Community
                   </Typography>

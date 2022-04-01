@@ -8,6 +8,7 @@ import { ethers } from "ethers";
 // Contract
 import { useAppContext } from "../contexts/AppContext";
 import { useSnackbar } from "notistack";
+import { useNavigate } from 'react-router-dom'
 
 export default function MultiActionAreaCard({ NFT }) {
   const context = useAppContext();
@@ -15,6 +16,7 @@ export default function MultiActionAreaCard({ NFT }) {
   const [data, setData] = useState(null);
   const [NFTData, setNFTData] = useState(null);
   const NFTContract = context.NFTContract;
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
@@ -59,12 +61,18 @@ export default function MultiActionAreaCard({ NFT }) {
     });
   }
 
+  const resell = (NFT) => {
+    // history.push('/resell')
+    localStorage.setItem("NFT", JSON.stringify(NFTData))
+    navigate("/resell");
+  }
+
   return (
     <Card sx={{
       maxWidth: 260,
       margin: '20px'
     }}>
-      <CardActionArea>
+      <CardActionArea onClick={(idNFT) => {resell(NFT)}}>
         <CardMedia
           component="img"
           height="140"
@@ -74,10 +82,10 @@ export default function MultiActionAreaCard({ NFT }) {
         <Divider />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            Title : {data && data.name}
+            {data && data.name}
           </Typography>
           <Typography gutterBottom variant="h5" component="div">
-            P.I : {data && data.pi}
+            P.I : {data && data.pi} %
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {data && data.description}
@@ -90,10 +98,9 @@ export default function MultiActionAreaCard({ NFT }) {
           <Typography gutterBottom variant="h6" component="div">
           {NFTData !== null && Number(ethers.utils.formatEther(NFTData[3]))} BUSD
           </Typography>
-          {NFTData !== null &&
-            !NFTData[0] ?
+          {NFTData !== null && context.walletAddress !== process.env.REACT_APP_DAVIDE_WALLET && !NFTData[0] ?
             (<Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => {resellNFT(NFTData.tokenId)}} >Resell</Button>)
-            :
+            : NFTData !== null && context.walletAddress !== process.env.REACT_APP_DAVIDE_WALLET && NFTData[0] &&
             (<Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => {cancelResellNFT(NFTData.tokenId)}} >Cancel Resell</Button>)
           }
         </Stack>

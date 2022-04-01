@@ -1,9 +1,12 @@
+import { React, useEffect, useState } from 'react'
 import { motion } from 'framer-motion';
 // material
 import { styled } from '@mui/material/styles';
 import { Container, Typography, Stack, Divider, Grid } from '@mui/material';
 //
 import { varWrapEnter, varFadeInRight, varFadeInUp } from '../../animate';
+import nftAbi from "../../../contracts/abi/NFTAbi.json";
+import Web3 from "web3";
 
 import ReactPlayer from 'react-player'
 
@@ -45,11 +48,23 @@ const HeroOverlayStyle = styled(motion.img)({
 // ----------------------------------------------------------------------
 
 export default function LandingWorks() {
+  const [videoUrl, setVideoUrl] = useState("");
+
+  let web3 = new Web3(Web3.givenProvider || 'https://data-seed-prebsc-1-s1.binance.org:8545/');
+
+  useEffect(() => {
+    const init = async() => {
+      const nftContract = await new web3.eth.Contract(nftAbi, process.env.REACT_APP_NFT_CONTRACT_ADDRESS);
+      const uri = await nftContract.methods.getVideoUrl().call();
+      console.log('videourl', uri);
+      setVideoUrl(uri);
+    }
+    init();
+  }, []);
   return (
     <>
       <RootStyle initial="initial" animate="animate" variants={varWrapEnter}>
         <HeroOverlayStyle alt="overlay" src="/img/overlay.svg" variants={varFadeInUp} />
-
         <Container maxWidth="lg">
           <ContentStyle>
             <motion.div variants={varFadeInRight}>
@@ -59,16 +74,14 @@ export default function LandingWorks() {
                 </Typography>
                 {/* <img src='/img/home/video.png' alt="vieo" style={{ width: '1000px' }} /> */}
                 <ReactPlayer
-                  url='https://www.youtube.com/watch?v=ysz5S6PUM-U'
+                  // url='https://www.youtube.com/watch?v=ysz5S6PUM-U'
+                  uri={videoUrl}
                   playing={true}
                   controls={true}
                   light={true}
                   loop={true}
                   width="100%"
                   height="600px"
-                // style={{
-                //   backgroundColor: 'red'
-                // }}
                 />
               </Stack>
             </motion.div>

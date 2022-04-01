@@ -124,7 +124,9 @@ export default function ConnectWalletButton({ sx }) {
 
     const nftContract = await new web3.eth.Contract(nftAbi, process.env.REACT_APP_NFT_CONTRACT_ADDRESS);
     const busdContract = await new web3.eth.Contract(busdAbi, process.env.REACT_APP_BUSD_CONTRACT_ADDRESS);
+    const _saleList = await nftContract.methods.getSaleList().call();
 
+    context.setSaleList(_saleList);
     context.setNFTContract(nftContract);
     context.setBUSDContract(busdContract);
   }

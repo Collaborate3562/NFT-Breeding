@@ -176,6 +176,11 @@
         "type": "bool"
       },
       {
+        "internalType": "bool",
+        "name": "isReselled",
+        "type": "bool"
+      },
+      {
         "internalType": "uint256",
         "name": "mintedTime",
         "type": "uint256"
@@ -184,6 +189,16 @@
         "internalType": "uint256",
         "name": "lastSaledTime",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "currentOwner",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -393,6 +408,11 @@
         "type": "uint256"
       },
       {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      },
+      {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
@@ -469,6 +489,11 @@
             "type": "bool"
           },
           {
+            "internalType": "bool",
+            "name": "isReselled",
+            "type": "bool"
+          },
+          {
             "internalType": "uint256",
             "name": "mintedTime",
             "type": "uint256"
@@ -477,6 +502,16 @@
             "internalType": "uint256",
             "name": "lastSaledTime",
             "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "previousOwner",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "currentOwner",
+            "type": "address"
           }
         ],
         "internalType": "struct BreedNFT.NFT[]",
@@ -495,6 +530,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getVideoUrl",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
       }
     ],
     "stateMutability": "view",
@@ -746,6 +794,19 @@
   {
     "inputs": [
       {
+        "internalType": "string",
+        "name": "_newUrl",
+        "type": "string"
+      }
+    ],
+    "name": "setVideoUrl",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes4",
         "name": "interfaceId",
         "type": "bytes4"
@@ -942,6 +1003,19 @@
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "videoUrl",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

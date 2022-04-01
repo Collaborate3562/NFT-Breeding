@@ -1,8 +1,14 @@
 import { motion } from 'framer-motion';
 // material
 import { styled } from '@mui/material/styles';
+import { React, useEffect, useState } from 'react';
 import { Container, Typography, Stack, TextField, Grid, Button } from '@mui/material';
+import { ethers } from "ethers";
+
 //
+import { useAppContext } from "../contexts/AppContext";
+import { useNavigate } from 'react-router-dom'
+import { useSnackbar } from "notistack";
 import { varFadeInUp, varFadeInRight } from '../components/animate';
 import Table from '../components/Table'
 
@@ -44,6 +50,102 @@ const HeroOverlayStyle = styled(motion.img)({
 // ----------------------------------------------------------------------
 
 export default function Resell() {
+  const context = useAppContext();
+
+  const NFT = localStorage.getItem("NFT") ? JSON.parse(localStorage.getItem("NFT")) : null;
+  const [data, setData] = useState(null)
+  const [NFTData, setNFTData] = useState(null);
+  const [owner, setOwner] = useState("");
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+  const NFTContract = context.NFTContract;
+  const BUSDContract = context.BUSDContract;
+  const account = context.walletAddress;
+
+  useEffect(() => {
+    const init = async() => {
+      const _owner = await NFTContract.methods.balanceOf(NFT.tokenId).call();
+      setOwner(_owner);
+    }
+    setNFTData(NFT);
+    if(context.walletConnected) {
+      fetch(NFT[1])
+      .then(res => res.json())
+      .then(resJson => {
+        console.log('resJson',resJson);
+        setData(resJson)
+      })
+      .catch(err => {
+        console.log("err =>", err)
+      }) 
+    } else {
+      navigate("/");
+    }
+  }, [])
+
+  const resellNFT = async (id) => {
+    await NFTContract.methods.resellNFT(id).send({from: context.walletAddress});
+
+    const newNFT = await NFTContract.methods.getNFT(id).call();
+    newNFT.tokenId = id;
+    setNFTData(newNFT);
+
+    enqueueSnackbar("Resell is available, confirm it in research page!", {
+      variant: "success",
+    });
+  }
+
+  const cancelResellNFT = async (id) => {
+    await NFTContract.methods.cancelResell(id).send({from: context.walletAddress});
+
+    const newNFT = await NFTContract.methods.getNFT(id).call();
+    newNFT.tokenId = id;
+    setNFTData(newNFT);
+
+    enqueueSnackbar("Resell is cancelled!", {
+      variant: "success",
+    });
+  }
+
+  const buyNFT = async(id, price) => {
+    if(!context.walletConnected) {
+      enqueueSnackbar("Please connect wallet", {
+        variant: "error"
+      })
+      return;
+    }
+    const owner = await NFTContract.methods.ownerOf(id).call();
+    if(account.toLowerCase() === owner.toLowerCase()) {
+      enqueueSnackbar("You are owner of this NFT.", {
+        variant: "error"
+      })
+      return;
+    }
+    const BUSDBalance = await BUSDContract.methods.balanceOf(account).call();
+    console.log('BUSDBalance', BUSDBalance);
+    console.log('price', price);
+    if(Number(ethers.utils.formatEther(BUSDBalance)) < Number(ethers.utils.formatEther(price))) {
+      enqueueSnackbar("Your balance is not sufficient.", {
+        variant: "error"
+      })
+      return;
+    }
+
+    const allowance = await BUSDContract.methods.allowance(account, process.env.REACT_APP_NFT_CONTRACT_ADDRESS).call();
+
+    if(Number(ethers.utils.formatEther(allowance)) < Number(ethers.utils.formatEther(price))) {
+      await BUSDContract.methods.approve(process.env.REACT_APP_NFT_CONTRACT_ADDRESS, ethers.utils.parseUnits(ethers.utils.formatEther(price), "ether")).send({from: account});
+    }
+
+    await NFTContract.methods.buyNFT(id).send({from: account});
+    enqueueSnackbar("NFT is yours!", {
+      variant: "success",
+    });
+    setTimeout(() => {
+      navigate('/assets');
+    }, 2000);
+  }
+
   return (
     <RootStyle id="move_top" initial="initial" animate="animate" variants={varFadeInUp}>
       <HeroOverlayStyle alt="overlay" src="/img/overlay.svg" variants={varFadeInUp} />
@@ -83,12 +185,12 @@ export default function Resell() {
               sx={{ textAlign: { xs: 'center', md: 'left' } }}
             >
               <Grid item xs={12} md={6} p={2}>
-                <img src="/img/resell/NFT.png" alt="NFt" style={{width: '100%', height: '100%'}} />
+                <img src={data && data.image} alt="NFt" style={{width: '100%', height: '100%'}} />
               </Grid>
 
               <Grid item xs={12} md={6} mt={3}>
                 <Typography sx={{ color: 'common.white', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '25px', mb: 5 }}>
-                  Sad monkey
+                {data && data.name}
                 </Typography>
                 {/* Price */}
                 <Stack sx={{ border: '2px solid #7414f5', borderRadius: '10px', width: {xs: '100%', md: '300px'}, mb: 5 }} >
@@ -96,7 +198,7 @@ export default function Resell() {
                     RESELL PRICE
                   </Typography>
                   <Typography sx={{ p: 1, color: '#7414f5', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px' }}>
-                    124,41 BUSD
+                  {NFTData !== null && Number(ethers.utils.formatEther(NFTData[3]))} BUSD
                   </Typography>
                 </Stack>
                 {/* P.I. */}
@@ -105,11 +207,18 @@ export default function Resell() {
                     P.I.
                   </Typography>
                   <Typography sx={{ color: '#7414f5', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px' }}>
-                    20%
+                  {data && data.pi}
                   </Typography>
                 </Stack>
                 {/* Resell button */}
-                <Button variant="contained" sx={{ border: '1px solid black', width: '300px' }}>RESELL FOR 124,41 BUSD</Button>
+                {
+                  NFTData !== null && NFTData[0] && owner === context.walletAddress ?
+                  (<Button variant="contained" sx={{ border: '1px solid black', width: '300px' }} onClick={() => {cancelResellNFT(NFTData['tokenId'])}} >Cancel RESELL</Button>)
+                  : NFTData !== null && !NFTData[0] && owner === context.walletAddress ?
+                  (<Button variant="contained" sx={{ border: '1px solid black', width: '300px' }} onClick={() => {resellNFT(NFTData['tokenId'])}} >RESELL FOR { NFTData !== null && data && (Number(ethers.utils.formatEther(NFTData[3])))*(Number(data.pi)+100)/100 } BUSD</Button>)
+                  : NFTData !== null && NFTData[0] && owner !== context.walletAddress && 
+                  (<Button variant="contained" sx={{ border: '1px solid black', width: '300px' }} onClick={() => {buyNFT(NFTData['tokenId'], NFTData[3])}} >Buy</Button>)
+                }
               </Grid>
             </Grid>
           </motion.div>
@@ -132,7 +241,7 @@ export default function Resell() {
                       Contract Address
                     </Typography>
                     <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
-                      0x465...ecc
+                      {process.env.REACT_APP_NFT_CONTRACT_ADDRESS}
                     </Typography>
                   </Stack>
                   {/* Token Id */}
@@ -141,7 +250,7 @@ export default function Resell() {
                       Token ID
                     </Typography>
                     <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
-                      123456
+                      {NFTData !== null && NFTData.tokenId}
                     </Typography>
                   </Stack>
                   {/* Token standard */}
@@ -180,7 +289,7 @@ export default function Resell() {
                     DESCRIPTION
                   </Typography>
                   <Typography sx={{ p: 1, color: '#7414f5', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px' }}>
-                    A monkey etc...
+                  {data && data.description}
                   </Typography>
                 </Stack>
               </Grid>
@@ -191,7 +300,7 @@ export default function Resell() {
             <Typography sx={{ color: 'common.white', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '25px', mb: 5, textAlign: 'left' }}>
               ACTIVITY
             </Typography>
-            <Table />
+            <Table NFT={NFTData}/>
           </motion.div>
         </ContentStyle>
       </Container>

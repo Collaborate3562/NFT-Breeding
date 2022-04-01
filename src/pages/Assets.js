@@ -75,8 +75,11 @@ export default function Assets() {
       if (data.length)
         setNFTs(data)
     }
+
     if(context.walletConnected) {
       init();
+    } else {
+      navigate('/');
     }
   }, [context.walletConnected])
 

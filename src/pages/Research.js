@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { styled } from '@mui/material/styles';
 import { Container, Typography, Stack, TextField, Grid, Button } from '@mui/material';
 import useSettings from '../hooks/useSettings';
+import { ethers } from "ethers";
 
 import { varFadeInUp, varFadeInRight } from '../components/animate';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -15,6 +16,7 @@ import { useAppContext } from "../contexts/AppContext";
 import { formatBigNumber } from 'utils/formatNumber';
 import { useSnackbar } from "notistack";
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom'
 
 // ----------------------------------------------------------------------
 
@@ -64,6 +66,7 @@ export default function Research() {
   const [plMin, setPLMin] = useState(0);
   const [plMax, setPLMax] = useState(0);
   // const { search_word } = useSettings();
+  const navigate = useNavigate();
 
   const applyFilter = async () => {
 
@@ -72,9 +75,10 @@ export default function Research() {
     const data = []
     for (let i = 1; i <= formatBigNumber(totalSupply); i++) {
       const NFT = await NFTContract.methods.getNFT(i).call();
-
-      NFT.tokenId = i;
-      data.push(NFT)
+      if(NFT[0]) {
+        NFT.tokenId = i;
+        data.push(NFT)
+      }
     }
 
     if (data.length > 0)
@@ -88,8 +92,8 @@ export default function Research() {
       // var res = await fetch(items[i][1]);
       const res = await ( await fetch(items[i][1]) ).json();
       if ((plMax != 0 && Number(res.pi) >= plMin && Number(res.pi) <= plMax) || plMax == 0)
-        if ((priceMax != 0 && priceMax >= Number(item[3]) && priceMin <= Number(item[3])) || priceMax == 0)
-          if (res.name.indexOf(search_word.search_word) > -1)
+        if ((priceMax != 0 && priceMax >= Number(ethers.utils.formatEther(item[3])) && priceMin <= Number(ethers.utils.formatEther(item[3])) || priceMax == 0))
+          if (res.name.toLowerCase().indexOf(search_word.search_word.toLowerCase()) > -1)
             returnData.push(item)
     }
 
@@ -106,24 +110,28 @@ export default function Research() {
     setSearch(search_word.search_word)
 
     const init = async () => {
-      const totalSupply = await NFTContract.methods.totalSupply().call();
+      if(NFTContract) {
+        const totalSupply = await NFTContract.methods.totalSupply().call();
 
-      const data = []
-      for (let i = 1; i <= formatBigNumber(totalSupply); i++) {
-        const NFT = await NFTContract.methods.getNFT(i).call();
-
-        NFT.tokenId = i;
-        data.push(NFT)
+        const data = []
+        for (let i = 1; i <= formatBigNumber(totalSupply); i++) {
+          const NFT = await NFTContract.methods.getNFT(i).call();
+          if(NFT[0]) {
+            NFT.tokenId = i;
+            data.push(NFT)
+          }
+        }
+  
+        if (data.length > 0)
+          setNFTs(await filter(data))
       }
-
-      if (data.length > 0)
-        setNFTs(await filter(data))
     }
-
     if(context.walletConnected) {
       init()
+    } else {
+      navigate('/');
     }
-  }, [pathname, search_word])
+  }, [pathname, search_word, context.walletConnected])
 
   const handleNew = async() => {
     if(context.walletConnected) {
@@ -132,14 +140,14 @@ export default function Research() {
       const data = []
       for (let i = 1; i <= formatBigNumber(totalSupply); i++) {
         const NFT = await NFTContract.methods.getNFT(i).call();
+        console.log(i, NFT);
         if(NFT[2]) {
           NFT.tokenId = i;
           data.push(NFT)
         }
       }
-
-      if (data.length > 0)
-        setNFTs(await filter(data))
+      console.log('new', data);
+      setNFTs(data)
     }
   }
 
@@ -150,14 +158,13 @@ export default function Research() {
       const data = []
       for (let i = 1; i <= formatBigNumber(totalSupply); i++) {
         const NFT = await NFTContract.methods.getNFT(i).call();
-        if(!NFT[3]) {
+        if(NFT[4]) {
           NFT.tokenId = i;
           data.push(NFT)
         }
       }
   
-      if (data.length > 0)
-        setNFTs(await filter(data))
+      setNFTs(data)
     }
   }
 
@@ -169,12 +176,14 @@ export default function Research() {
       for (let i = 1; i <= formatBigNumber(totalSupply); i++) {
         const NFT = await NFTContract.methods.getNFT(i).call();
 
-        NFT.tokenId = i;
-        data.push(NFT)
+        if(NFT[0]) {
+          NFT.tokenId = i;
+          data.push(NFT)
+        }
       }
 
       if (data.length > 0)
-        setNFTs(await filter(data))
+        setNFTs(data)
     }
   }
 
@@ -204,9 +213,9 @@ export default function Research() {
                     <ArrowDropDownIcon sx={{ fontSize: '40px' }} />
                   </Stack>
                   <Stack direction="row" alignItems={'center'} spacing={2} justifyContent="space-between">
-                    <TextField id="min_price" label="Min" variant="outlined" onChange={(e) => {if(Number(e.target.value) <= Number(priceMax)) setPriceMin(Number(e.target.value)); else setPriceMin(Number(priceMax))}} value={priceMin}/>
+                    <TextField id="min_price" label="Min" variant="outlined" onChange={(e) => setPriceMin(Number(e.target.value))} value={priceMin} />
                     <Typography variant="h6" sx={{ fontFamily: "Montserrat" }}>to</Typography>
-                    <TextField id="max_price" label="Max" variant="outlined" onChange={(e) => {if(Number(e.target.value) >= Number(priceMin)) setPriceMax(Number(e.target.value)); else setPriceMax(Number(priceMin))}} value={priceMax}/>
+                    <TextField id="max_price" label="Max" variant="outlined" onChange={(e) => setPriceMax(Number(e.target.value))} value={priceMax} />
                   </Stack>
                 </Stack>
 
@@ -214,9 +223,9 @@ export default function Research() {
                 <Stack spacing={2} sx={{ borderBottom: "solid 3px #7414f5" }} pb={1} mb={3}>
                   <Typography variant="h5" sx={{ fontFamily: "Montserrat" }}>P.I.</Typography>
                   <Stack direction="row" alignItems={'center'} spacing={2} justifyContent="space-between">
-                    <TextField id="min_price" label="Min" variant="outlined" onChange={(e) => {if(Number(e.target.value) <= Number(plMax)) setPLMin(Number(e.target.value)); else setPLMin(Number(plMax))}} value={plMin}/>
+                    <TextField id="min_price" label="Min" variant="outlined" onChange={(e) => {setPLMin(Number(e.target.value))}} value={plMin}/>
                     <Typography variant="h6" sx={{ fontFamily: "Montserrat" }}>to</Typography>
-                    <TextField id="max_price" label="Max" variant="outlined"  onChange={(e) => {if(Number(e.target.value) >= Number(plMin)) setPLMax(Number(e.target.value)); else setPLMax(Number(plMin))}} value={plMax}/>
+                    <TextField id="max_price" label="Max" variant="outlined"  onChange={(e) => {setPLMax(Number(e.target.value))}} value={plMax}/>
                   </Stack>
                 </Stack>
 

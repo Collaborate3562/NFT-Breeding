@@ -11,6 +11,7 @@ const AppContextProvider = ({ children }) => {
   const [web3, setWeb3] = useState(0);
   const [NFTContract, setNFTContract] = useState(null);
   const [BUSDContract, setBUSDContract] = useState(null);
+  const [saleList, setSaleList] = useState(null);
 
   return (
     <AppContext.Provider 
@@ -28,7 +29,9 @@ const AppContextProvider = ({ children }) => {
         NFTContract,
         setNFTContract,
         BUSDContract,
-        setBUSDContract
+        setBUSDContract,
+        saleList,
+        setSaleList
       }}
     >
       {children}
