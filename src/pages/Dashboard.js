@@ -86,7 +86,6 @@ export default function Dashboard() {
   }, [])
 
   const handleChangeUrl = async() => {
-    console.log('handleChangeurl');
     if(url === "") {
       enqueueSnackbar("Please insert Url.", {
         variant: "error"
@@ -132,7 +131,7 @@ export default function Dashboard() {
                           EARNING FROM NEW NFTs SOLD
                         </Typography>
                         <Typography sx={{ p: 1, color: '#7414f5', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '15px' }}>
-                          {earnedFromNewNFT} BUSD
+                          { Number(earnedFromNewNFT).toFixed(2) } BUSD
                         </Typography>
                       </Stack>
                     </Stack>
@@ -155,7 +154,7 @@ export default function Dashboard() {
                           EARNING FROM ROYALTIES
                         </Typography>
                         <Typography sx={{ p: 1, color: '#7414f5', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '15px' }}>
-                          {earnedFromRoyalty} BUSD
+                          { Number(earnedFromRoyalty).toFixed(2) } BUSD
                         </Typography>
                       </Stack>
                     </Stack>

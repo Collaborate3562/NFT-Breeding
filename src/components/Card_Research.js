@@ -17,11 +17,12 @@ export default function Card_Research({ NFT }) {
 
   const navigate = useNavigate();
 
-  const [data, setData] = useState(null)
-  const [mintingApproved, setMintingApproved] = useState(false)
+  const [data, setData] = useState(null);
+  const [NFTData, setNFTData] = useState(null);
+  const [mintingApproved, setMintingApproved] = useState(false);
   const [isSaled, setIsSaled] = useState(false);
-  const search_word = useSelector(state => state.search_word)
-  const [search, setSearch] = useState("")
+  const search_word = useSelector(state => state.search_word);
+  const [search, setSearch] = useState("");
   const [owner, setOwner] = useState("");
   const account = context.walletAddress;
 
@@ -30,14 +31,19 @@ export default function Card_Research({ NFT }) {
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    // setSearch(search_word.search_word)
+    // console.log('card_rearch', NFT);
+    setNFTData(NFT);
+  }, [NFT]);
+
+  useEffect(() => {
     const init = async () => {
       const _owner = await NFTContract.methods.ownerOf(NFT.tokenId).call();
       setOwner(_owner);
     }
 
     if(context.walletConnected) {
-      fetch(NFT[1])
+      if(NFTData !== null) {
+        fetch(NFTData[1])
         .then(res => res.json())
         .then(resJson => {
           setData(resJson)
@@ -45,10 +51,11 @@ export default function Card_Research({ NFT }) {
         .catch(err => {
           console.log("err =>", err)
         })
-      setIsSaled(NFT[0]);
-      init();
+        setIsSaled(NFTData[0]);
+        init();
+      }
     }
-  }, [NFT])
+  }, [NFTData]);
 
   const buyNFT = async (tokenId, price, isNewly) => {
     if(!context.walletConnected) {
@@ -90,7 +97,7 @@ export default function Card_Research({ NFT }) {
   }
 
   const resell = (NFT) => {
-    localStorage.setItem("NFT", JSON.stringify(NFT))
+    localStorage.setItem("NFT", JSON.stringify(NFTData));
     navigate("/resell");
   }
 
@@ -123,20 +130,16 @@ export default function Card_Research({ NFT }) {
       <Divider />
       <CardActions>
         <Stack direction="row" spacing={10} justifyContent={'space-around'} alignItems={'center'}>
-          <Typography gutterBottom variant="h6" component="div">
-            {/* {NFT[3] && ethers.utils.formatUnits(NFT[3])} BUSD */}
-            {NFT[3] && Number(ethers.utils.formatEther(NFT[3]))} BUSD
-          </Typography>
-
-          {/* {mintingApproved ? ( */}
-          {NFT[0] && account !== process.env.REACT_APP_DAVIDE_WALLET && 
-            <Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => { buyNFT(NFT.tokenId, NFT[3], NFT[2]) }}>
+          <Stack direction="col" spacing={10} justifyContent={'space-around'} alignItems={'center'}>
+            <Typography gutterBottom variant="h6" component="div">
+              { NFTData !== null && Number(ethers.utils.formatEther(NFTData[3])).toFixed(2) } BUSD
+            </Typography>
+          </Stack>
+          {NFTData !== null && NFTData[0] && account !== process.env.REACT_APP_DAVIDE_WALLET && 
+            <Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => { buyNFT(NFTData.tokenId, NFTData[3], NFTData[2]) }}>
               Buy
             </Button>
           }
-            {/* ) : (
-            <Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => handleMintingApprove(NFT[3])}>Approve</Button>
-          )} */}
         </Stack>
       </CardActions>
     </Card>

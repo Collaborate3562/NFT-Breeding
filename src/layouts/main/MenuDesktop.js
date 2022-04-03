@@ -2,10 +2,11 @@ import PropTypes from 'prop-types';
 import { Icon } from '@iconify/react';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { NavLink as RouterLink, useLocation } from 'react-router-dom';
+import { NavLink as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import arrowIosUpwardFill from '@iconify/icons-eva/arrow-ios-upward-fill';
 import arrowIosDownwardFill from '@iconify/icons-eva/arrow-ios-downward-fill';
 import { useAppContext } from "../../contexts/AppContext";
+import { useSnackbar } from "notistack";
 // material
 import { styled } from '@mui/material/styles';
 import { Box, Link, Grid, List, Stack, Popover, ListItem, ListSubheader, CardActionArea } from '@mui/material';
@@ -19,6 +20,7 @@ const LinkStyle = styled(Link)(({ theme }) => ({
   transition: theme.transitions.create('opacity', {
     duration: theme.transitions.duration.shortest
   }),
+  cursor: 'pointer',
   '&:hover': {
     opacity: 0.48,
     textDecoration: 'none'
@@ -63,9 +65,21 @@ function IconBullet({ type = 'item' }) {
 
 function MenuDesktopItem({ item, isHome, isOpen, isOffset, onOpen, onClose }) {
   const context = useAppContext();
+  const { enqueueSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
   const { title, path, children } = item;
   const account  = context.walletAddress;
+
+  const handleMenu = (path) => {
+    if(!context.walletConnected && path !== '/') {
+      enqueueSnackbar("Please connect wallet", {
+        variant: "error"
+      })
+      return;
+    }
+    navigate(path);
+  }
 
   if (children) {
     return (
@@ -184,9 +198,10 @@ function MenuDesktopItem({ item, isHome, isOpen, isOffset, onOpen, onClose }) {
 
   return (
     <LinkStyle
-      to={path}
-      component={RouterLink}
-      end={path === '/'}
+      // to={ path }
+      // component={RouterLink}
+      // end={path === '/'}
+      onClick={ () => handleMenu(path) }
       sx={{
         ...(isHome && { color: 'common.white' }),
         ...(isOffset && { color: 'common.white' }),

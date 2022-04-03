@@ -51,17 +51,17 @@ export default function CustomizedTables({ NFT }) {
   useEffect(() => {
     const init = async () => {
       if(NFT) {
-        console.log('table', NFT);
+        console.log('table', NFT.tokenId);
         const id = NFT.tokenId;
 
         const list = [];
         const _saleList = await NFTContract.methods.getSaleList().call();
         for(let i = 0; i < _saleList.length; i++) {
-          console.log('sale', _saleList[i]);
-          if(_saleList[i].tokenId === id) {
+          if(Number(_saleList[i].tokenId) === Number(id)) {
             list.push(_saleList[i]);
           }
         }
+        console.log('list', list);
         setSaleList(list);
       }
     }
@@ -88,7 +88,7 @@ export default function CustomizedTables({ NFT }) {
                 {row.previousOwner === "0x0000000000000000000000000000000000000000" ? new Date(Number(row.mintedTime)*1000).toLocaleDateString() : new Date(Number(row.lastSaledTime)*1000).toLocaleDateString()}
               </StyledTableCell>
               <StyledTableCell align="center">{row.previousOwner === "0x0000000000000000000000000000000000000000" ? 'Minted' : 'sale'}</StyledTableCell>
-              <StyledTableCell align="center">{Number(ethers.utils.formatEther(row.price))} BUSD</StyledTableCell>
+              <StyledTableCell align="center">{ Number(ethers.utils.formatEther(row.price)).toFixed(2) } BUSD</StyledTableCell>
               <StyledTableCell align="center">
               {
                 String(row.previousOwner).substring(0, 6) +

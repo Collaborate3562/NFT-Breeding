@@ -72,7 +72,6 @@ export default function Resell() {
       fetch(NFT[1])
       .then(res => res.json())
       .then(resJson => {
-        console.log('resJson',resJson);
         setData(resJson)
       })
       .catch(err => {
@@ -155,33 +154,6 @@ export default function Resell() {
           <motion.div variants={varFadeInRight}>
             <Grid
               container
-              direction="row"
-              alignItems="center"
-              sx={{ textAlign: { xs: 'center', md: 'left' }, border: "2px solid #7414f5", borderRadius: '10px' }}
-            >
-              <Grid item xs={12} md={6} sx={{ borderRight: "1px solid #7414f5" }}>
-                <Typography sx={{ color: 'common.white', fontFamily: 'Montserrat', textAlign: 'center', fontWeight: 'bold' }}>
-                  UPLOAD NFT BOUGHT FROM BREEDINGNFT
-                </Typography>
-              </Grid>
-
-              {/* <Divider orientation="vertical" flexItem sx={{ borderColor: "#7414F5" }} /> */}
-
-              <Grid item xs={12} md={6}>
-                <TextField
-                  sx={{ fontFamily: 'MontserratItalic', textAlign: 'center', color: "#7414f5", mt: 0 }}
-                  label="Paste here contract address from your wallet"
-                  type="search"
-                  fullWidth
-                  variant="standard"
-                />
-              </Grid>
-            </Grid>
-          </motion.div>
-
-          <motion.div variants={varFadeInRight}>
-            <Grid
-              container
               sx={{ textAlign: { xs: 'center', md: 'left' } }}
             >
               <Grid item xs={12} md={6} p={2}>
@@ -195,10 +167,18 @@ export default function Resell() {
                 {/* Price */}
                 <Stack sx={{ border: '2px solid #7414f5', borderRadius: '10px', width: {xs: '100%', md: '300px'}, mb: 5 }} >
                   <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px', borderBottom: "1px solid #7414f5" }}>
+                    INITIAL PRICE
+                  </Typography>
+                  <Typography sx={{ p: 1, color: '#7414f5', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px' }}>
+                  { NFTData !== null && data && Number(ethers.utils.formatEther(NFTData[3])).toFixed(2) } BUSD
+                  </Typography>
+                </Stack>
+                <Stack sx={{ border: '2px solid #7414f5', borderRadius: '10px', width: {xs: '100%', md: '300px'}, mb: 5 }} >
+                  <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px', borderBottom: "1px solid #7414f5" }}>
                     RESELL PRICE
                   </Typography>
                   <Typography sx={{ p: 1, color: '#7414f5', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px' }}>
-                  {NFTData !== null && Number(ethers.utils.formatEther(NFTData[3]))} BUSD
+                  { NFTData !== null && data && Number((Number(ethers.utils.formatEther(NFTData[3])))*(Number(data.pi)+100)/100).toFixed(2) } BUSD
                   </Typography>
                 </Stack>
                 {/* P.I. */}
@@ -215,7 +195,7 @@ export default function Resell() {
                   NFTData !== null && NFTData[0] && owner === context.walletAddress ?
                   (<Button variant="contained" sx={{ border: '1px solid black', width: '300px' }} onClick={() => {cancelResellNFT(NFTData['tokenId'])}} >Cancel RESELL</Button>)
                   : NFTData !== null && !NFTData[0] && owner === context.walletAddress ?
-                  (<Button variant="contained" sx={{ border: '1px solid black', width: '300px' }} onClick={() => {resellNFT(NFTData['tokenId'])}} >RESELL FOR { NFTData !== null && data && (Number(ethers.utils.formatEther(NFTData[3])))*(Number(data.pi)+100)/100 } BUSD</Button>)
+                  (<Button variant="contained" sx={{ border: '1px solid black', width: '300px' }} onClick={() => {resellNFT(NFTData['tokenId'])}} >RESELL FOR { NFTData !== null && data && Number((Number(ethers.utils.formatEther(NFTData[3])))*(Number(data.pi)+100)/100).toFixed(2) } BUSD</Button>)
                   : NFTData !== null && NFTData[0] && owner !== context.walletAddress && 
                   (<Button variant="contained" sx={{ border: '1px solid black', width: '300px' }} onClick={() => {buyNFT(NFTData['tokenId'], NFTData[3])}} >Buy</Button>)
                 }
@@ -237,46 +217,52 @@ export default function Resell() {
                   </Typography>
                   {/* Contract address */}
                   <Stack direction="row" spacing={10}>
-                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
+                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px', width: '30%' }}>
                       Contract Address
                     </Typography>
-                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
-                      {process.env.REACT_APP_NFT_CONTRACT_ADDRESS}
+                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px', width: '70%' }}>
+                      <a href={`https://testnet.bscscan.com/address/${process.env.REACT_APP_NFT_CONTRACT_ADDRESS}`} target="_blank">
+                        {
+                          String(process.env.REACT_APP_NFT_CONTRACT_ADDRESS).substring(0, 6) +
+                          "..." +
+                          String(process.env.REACT_APP_NFT_CONTRACT_ADDRESS).substring(38)
+                        }
+                      </a>
                     </Typography>
                   </Stack>
                   {/* Token Id */}
                   <Stack direction="row" spacing={10}>
-                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
+                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px', width: '30%' }}>
                       Token ID
                     </Typography>
-                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
+                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px', width: '70%' }}>
                       {NFTData !== null && NFTData.tokenId}
                     </Typography>
                   </Stack>
                   {/* Token standard */}
                   <Stack direction="row" spacing={10}>
-                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
+                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px', width: '30%' }}>
                       Token standard
                     </Typography>
-                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
+                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px', width: '70%' }}>
                       BEP20
                     </Typography>
                   </Stack>
                   {/* Blockchain */}
                   <Stack direction="row" spacing={10}>
-                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
+                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px', width: '30%' }}>
                       Blockchain
                     </Typography>
-                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
+                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px', width: '70%' }}>
                       BSC
                     </Typography>
                   </Stack>
                   {/* Created by */}
                   <Stack direction="row" spacing={10}>
-                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
+                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px', width: '30%' }}>
                       Created by
                     </Typography>
-                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px' }}>
+                    <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontSize: '15px', width: '70%' }}>
                       BreedingNFT
                     </Typography>
                   </Stack>

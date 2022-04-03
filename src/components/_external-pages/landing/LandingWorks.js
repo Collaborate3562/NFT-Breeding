@@ -72,17 +72,15 @@ export default function LandingWorks() {
                 <Typography sx={{ color: 'common.white', fontSize: '25px', fontFamily: 'MontserratItalic' }}>
                   How Breeding NFT works?
                 </Typography>
-                {/* <img src='/img/home/video.png' alt="vieo" style={{ width: '1000px' }} /> */}
-                <ReactPlayer
-                  // url='https://www.youtube.com/watch?v=ysz5S6PUM-U'
-                  uri={videoUrl}
-                  playing={true}
-                  controls={true}
-                  light={true}
-                  loop={true}
-                  width="100%"
-                  height="600px"
-                />
+                  <ReactPlayer
+                    url={videoUrl}
+                    playing={true}
+                    controls={true}
+                    light={true}
+                    loop={true}
+                    width="100%"
+                    height="600px"
+                  />
               </Stack>
             </motion.div>
 

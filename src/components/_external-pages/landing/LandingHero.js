@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion';
+import { useNavigate } from "react-router-dom";
 // material
 import { styled } from '@mui/material/styles';
+import { useAppContext } from "../../../contexts/AppContext";
 import { Button, Container, Typography, Stack, Divider, Grid } from '@mui/material';
 import threeDImage from "../../../assets/images/3D_CARD.gif";
 //
 import { varWrapEnter, varFadeInUp, varFadeIn } from '../../animate';
+import { useSnackbar } from "notistack";
 import ReactPlayer from 'react-player'
 
 // ----------------------------------------------------------------------
@@ -61,6 +64,28 @@ const HeroOverlayStyle = styled(motion.img)({
 // ----------------------------------------------------------------------
 
 export default function LandingHero() {
+  const context = useAppContext();
+  const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const handleAssets = () => {
+    if(!context.walletConnected) {
+      enqueueSnackbar("Please connect wallet", {
+        variant: "error"
+      })
+      return;
+    }
+    navigate("/assets");
+  }
+  const handleResearch = () => {
+    if(!context.walletConnected) {
+      enqueueSnackbar("Please connect wallet", {
+        variant: "error"
+      })
+      return;
+    }
+    navigate("/research");
+  }
   return (
     <>
       <RootStyle initial="initial" animate="animate" variants={varWrapEnter}>
@@ -76,18 +101,23 @@ export default function LandingHero() {
                       Become a NFT Breeder
                     </Typography>
                     <Typography sx={{ color: 'common.white', fontSize: '25px', fontFamily: 'Montserrat', fontWeight: 'bold' }}>
-                      Buy and resell on BreedingNFT only, <br />
-                      making a profit through P.I.
+                      Buy and resell just on Breeding NFT, <br />
+                      increasing the value of the NFTs <br />
+                      to each transaction
+                      {/* Buy and resell on BreedingNFT only, 
+                      making a profit through P.I. */}
                     </Typography>
                     <Typography sx={{ color: 'common.white', fontSize: '25px', fontFamily: 'MontserratItalic' }}>
-                      An exclusive NFT marketplace that<br /> allows anyone to earn
+                      An exclusive NFT platform, <br />
+                      based on the forced increase of the price
+                      {/* An exclusive NFT marketplace that<br /> allows anyone to earn */}
                     </Typography>
                     <Stack direction="row" spacing={2} justifyContent="space-around">
-                      <Button href="/research" variant='contained' sx={{ background: 'white', border: '2px solid black', color: '#7414F5', fontSize: '20px', fontFamily: 'Montserrat' }}>
-                        Explore
+                      <Button variant='contained' sx={{ background: 'white', border: '2px solid black', color: '#7414F5', fontSize: '20px', fontFamily: 'Montserrat' }} onClick={() => {handleAssets()}}>
+                        My Assets
                       </Button>
-                      <Button href="/resell" variant='contained' sx={{ border: '2px solid white', fontSize: '20px', fontFamily: 'Montserrat' }}>
-                        Resell
+                      <Button variant='contained' sx={{ border: '2px solid white', fontSize: '20px', fontFamily: 'Montserrat' }} onClick={() => {handleResearch()}}>
+                        Research
                       </Button>
                     </Stack>
                   </Stack>
