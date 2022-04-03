@@ -64,8 +64,8 @@ export default function Resell() {
 
   useEffect(() => {
     const init = async() => {
-      const _owner = await NFTContract.methods.balanceOf(NFT.tokenId).call();
-      setOwner(_owner);
+      const _owner = await NFTContract.methods.ownerOf(Number(NFT.tokenId)).call();
+      setOwner(_owner.toLowerCase());
     }
     setNFTData(NFT);
     if(context.walletConnected) {
@@ -77,6 +77,7 @@ export default function Resell() {
       .catch(err => {
         console.log("err =>", err)
       }) 
+      init();
     } else {
       navigate("/");
     }
@@ -192,11 +193,11 @@ export default function Resell() {
                 </Stack>
                 {/* Resell button */}
                 {
-                  NFTData !== null && NFTData[0] && owner === context.walletAddress ?
+                  NFTData !== null && NFTData[0] && owner === context.walletAddress.toLowerCase() ?
                   (<Button variant="contained" sx={{ border: '1px solid black', width: '300px' }} onClick={() => {cancelResellNFT(NFTData['tokenId'])}} >Cancel RESELL</Button>)
-                  : NFTData !== null && !NFTData[0] && owner === context.walletAddress ?
+                  : NFTData !== null && !NFTData[0] && owner === context.walletAddress.toLowerCase() ?
                   (<Button variant="contained" sx={{ border: '1px solid black', width: '300px' }} onClick={() => {resellNFT(NFTData['tokenId'])}} >RESELL FOR { NFTData !== null && data && Number((Number(ethers.utils.formatEther(NFTData[3])))*(Number(data.pi)+100)/100).toFixed(2) } BUSD</Button>)
-                  : NFTData !== null && NFTData[0] && owner !== context.walletAddress && 
+                  : NFTData !== null && NFTData[0] && owner !== context.walletAddress.toLowerCase() && 
                   (<Button variant="contained" sx={{ border: '1px solid black', width: '300px' }} onClick={() => {buyNFT(NFTData['tokenId'], NFTData[3])}} >Buy</Button>)
                 }
               </Grid>

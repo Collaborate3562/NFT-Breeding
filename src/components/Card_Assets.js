@@ -143,12 +143,12 @@ export default function MultiActionAreaCard({ NFT }) {
                     BUSD
                   </Typography>
                 </Stack>
+                {NFTData !== null && context.walletAddress !== process.env.REACT_APP_DAVIDE_WALLET && !NFTData[0] ?
+                  (<Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => {resellNFT(NFTData.tokenId)}} >Resell</Button>)
+                  : NFTData !== null && context.walletAddress !== process.env.REACT_APP_DAVIDE_WALLET && NFTData[0] &&
+                  (<Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => {cancelResellNFT(NFTData.tokenId)}} >Cancel Resell</Button>)
+                }
               </CardContent>
-              {NFTData !== null && context.walletAddress !== process.env.REACT_APP_DAVIDE_WALLET && !NFTData[0] ?
-                (<Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => {resellNFT(NFTData.tokenId)}} >Resell</Button>)
-                : NFTData !== null && context.walletAddress !== process.env.REACT_APP_DAVIDE_WALLET && NFTData[0] &&
-                (<Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => {cancelResellNFT(NFTData.tokenId)}} >Cancel Resell</Button>)
-              }
             </Stack>
           </CardActions>
         </Card>
