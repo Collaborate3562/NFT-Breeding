@@ -47,6 +47,13 @@ const HeroOverlayStyle = styled(motion.img)({
   objectFit: 'cover',
   position: 'absolute'
 });
+
+const DescriptionStyle = styled(motion.div)({
+  overflowWrap: 'break-all',
+  wordWrap: 'break-all',
+  wordBreak: 'break-all'
+})
+
 // ----------------------------------------------------------------------
 
 export default function Resell() {
@@ -79,9 +86,21 @@ export default function Resell() {
       }) 
       init();
     } else {
-      navigate("/");
+      navigate( "/");
     }
   }, [])
+
+  useEffect(() => {
+    if(context.networkId !== 0 && context.networkId !== Number(process.env.REACT_APP_TEST_NETWORK_ID)) {
+      enqueueSnackbar("Please select Binance Smart Chain Testnet.", {
+        variant: "error"
+      })
+
+      setTimeout(() => {
+        navigate('/');
+      }, 3000);
+    }
+  }, [context.networkId])
 
   const resellNFT = async (id) => {
     await NFTContract.methods.resellNFT(id).send({from: context.walletAddress});
@@ -168,7 +187,7 @@ export default function Resell() {
                 {/* Price */}
                 <Stack sx={{ border: '2px solid #7414f5', borderRadius: '10px', width: {xs: '100%', md: '300px'}, mb: 5 }} >
                   <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px', borderBottom: "1px solid #7414f5" }}>
-                    INITIAL PRICE
+                    PURCHASED PRICE
                   </Typography>
                   <Typography sx={{ p: 1, color: '#7414f5', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px' }}>
                   { NFTData !== null && data && Number(ethers.utils.formatEther(NFTData[3])).toFixed(2) } BUSD
@@ -275,8 +294,8 @@ export default function Resell() {
                   <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px', borderBottom: "1px solid #7414f5" }}>
                     DESCRIPTION
                   </Typography>
-                  <Typography sx={{ p: 1, color: '#7414f5', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px' }}>
-                  {data && data.description}
+                  <Typography sx={{ p: 1, color: '#7414f5', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px', wordWrap: 'break-all' }}>
+                    <DescriptionStyle>{data && data.description}</DescriptionStyle>
                   </Typography>
                 </Stack>
               </Grid>

@@ -245,7 +245,7 @@ export default function Minting() {
                     {/* Price */}
                     <Stack sx={{ border: '2px solid #7414f5', borderRadius: '10px', width: '300px', mb: 5 }}>
                       <Typography sx={{ p: 1, color: 'common.white', fontFamily: 'Montserrat', fontWeight: 'bold', fontSize: '20px', borderBottom: "1px solid #7414f5" }}>
-                        INITIAL PRICE
+                        PURCHASED PRICE
                       </Typography>
                       <TextField
                         name="price"

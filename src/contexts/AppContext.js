@@ -12,6 +12,7 @@ const AppContextProvider = ({ children }) => {
   const [NFTContract, setNFTContract] = useState(null);
   const [BUSDContract, setBUSDContract] = useState(null);
   const [saleList, setSaleList] = useState(null);
+  const [networkId, setNetworkId] = useState(0);
 
   return (
     <AppContext.Provider 
@@ -31,7 +32,9 @@ const AppContextProvider = ({ children }) => {
         BUSDContract,
         setBUSDContract,
         saleList,
-        setSaleList
+        setSaleList,
+        networkId,
+        setNetworkId
       }}
     >
       {children}

@@ -1,3 +1,4 @@
+import { React, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from "react-router-dom";
 // material
@@ -68,9 +69,27 @@ export default function LandingHero() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
 
+  useEffect(() => {
+    if(context.networkId !== 0 && context.networkId !== Number(process.env.REACT_APP_TEST_NETWORK_ID)) {
+      enqueueSnackbar("Please select Binance Smart Chain Testnet.", {
+        variant: "error"
+      })
+
+      setTimeout(() => {
+        navigate('/');
+      }, 3000);
+    }
+  }, [context.networkId])
+
   const handleAssets = () => {
     if(!context.walletConnected) {
       enqueueSnackbar("Please connect wallet", {
+        variant: "error"
+      })
+      return;
+    }
+    if(context.networkId !== Number(process.env.REACT_APP_TEST_NETWORK_ID)) {
+      enqueueSnackbar("Please select Binance Smart Chain Testnet.", {
         variant: "error"
       })
       return;
@@ -80,6 +99,12 @@ export default function LandingHero() {
   const handleResearch = () => {
     if(!context.walletConnected) {
       enqueueSnackbar("Please connect wallet", {
+        variant: "error"
+      })
+      return;
+    }
+    if(context.networkId !== Number(process.env.REACT_APP_TEST_NETWORK_ID)) {
+      enqueueSnackbar("Please select Binance Smart Chain Testnet.", {
         variant: "error"
       })
       return;

@@ -129,6 +129,7 @@ export default function ConnectWalletButton({ sx }) {
     context.setSaleList(_saleList);
     context.setNFTContract(nftContract);
     context.setBUSDContract(busdContract);
+    context.setNetworkId(Number(chainId));
   }
 
   const refreshAccountData = async() => {

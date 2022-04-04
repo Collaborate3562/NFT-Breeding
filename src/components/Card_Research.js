@@ -36,6 +36,18 @@ export default function Card_Research({ NFT }) {
   }, [NFT]);
 
   useEffect(() => {
+    if(context.networkId !== 0 && context.networkId !== Number(process.env.REACT_APP_TEST_NETWORK_ID)) {
+      enqueueSnackbar("Please select Binance Smart Chain Testnet.", {
+        variant: "error"
+      })
+
+      setTimeout(() => {
+        navigate('/');
+      }, 3000);
+    }
+  }, [context.networkId])
+
+  useEffect(() => {
     const init = async () => {
       const _owner = await NFTContract.methods.ownerOf(NFT.tokenId).call();
       setOwner(_owner);
@@ -123,7 +135,11 @@ export default function Card_Research({ NFT }) {
             P.I : {data && data.pi} %
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {data && data.description}
+            {data && data.description.length > 19 ?
+              String(data.description).substring(0, 19) + "..."
+              : data && data.description.length < 19 &&
+              data.description
+            }
           </Typography>
         </CardContent>
       </CardActionArea>

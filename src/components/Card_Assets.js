@@ -41,6 +41,18 @@ export default function MultiActionAreaCard({ NFT }) {
   }, [])
 
   useEffect(() => {
+    if(context.networkId !== 0 && context.networkId !== Number(process.env.REACT_APP_TEST_NETWORK_ID)) {
+      enqueueSnackbar("Please select Binance Smart Chain Testnet.", {
+        variant: "error"
+      })
+
+      setTimeout(() => {
+        navigate('/');
+      }, 3000);
+    }
+  }, [context.networkId])
+
+  useEffect(() => {
     if(NFTData !== null) {
       setLoading(true);
       fetch(NFTData[1])
@@ -68,6 +80,16 @@ export default function MultiActionAreaCard({ NFT }) {
   }
 
   const cancelResellNFT = async (id) => {
+    // if(context.networkId !== process.env.REACT_APP_TEST_NETWORK_ID) {
+    //   enqueueSnackbar("Please select Binance Smart Chain Testnet.", {
+    //     variant: "error"
+    //   })
+
+    //   setTimeout(() => {
+    //     navigate('/resell');
+    //   }, 2000);
+    //   return;
+    // }
     await NFTContract.methods.cancelResell(id).send({from: context.walletAddress});
 
     const newNFT = await NFTContract.methods.getNFT(id).call();
@@ -118,16 +140,16 @@ export default function MultiActionAreaCard({ NFT }) {
           <Divider />
           <CardActions>
             <Stack direction="row" spacing={3} justifyContent={'space-around'} alignItems={'center'}>
-              <CardContent sx={{ p: 0 }}>
-                <Stack direction="row" spacing={1} sx={{ p: 0 }}>
-                  <Typography component="div" sx={{ width: '50%', fontSize: '14px', minWidth: '100px', color: '#369058', fontWeight: 'bold' }}>
-                    INITIAL PRICE
+              <CardContent sx={{ p: 0 }} spacing={2}>
+                <Stack direction="row" spacing={2} sx={{ p: 0 }}>
+                  <Typography component="div" sx={{ width: '50%', fontSize: '12px', minWidth: '120px', color: '#369058', fontWeight: 'bold' }}>
+                    PURCHASED PRICE
                   </Typography>
-                  <Typography component="div" sx={{ width: '50%', fontSize: '14px', minWidth: '100px', color: '#B62A33', fontWeight: 'bold' }}>
+                  <Typography component="div" sx={{ width: '50%', fontSize: '12px', minWidth: '120px', color: '#B62A33', fontWeight: 'bold' }}>
                     RESELL PRICE
                   </Typography>
                 </Stack>
-                <Stack direction="row" spacing={1} sx={{ p: 0 }}>
+                <Stack direction="row" spacing={2} sx={{ p: 0 }}>
                   <Typography variant="h6" component="div" sx={{ width: '50%' }}>
                     { NFTData !== null && Number(ethers.utils.formatEther(NFTData[3])).toFixed(2)}
                   </Typography>
@@ -135,7 +157,7 @@ export default function MultiActionAreaCard({ NFT }) {
                     { NFTData !== null && data && Number((Number(ethers.utils.formatEther(NFTData[3])))*(Number(data.pi)+100)/100).toFixed(2) }
                   </Typography>
                 </Stack>
-                <Stack direction="row" spacing={1} sx={{ p: 0 }}>
+                <Stack direction="row" spacing={2} sx={{ p: 0 }}>
                   <Typography variant="h6" component="div" sx={{ width: '50%' }}>
                     BUSD
                   </Typography>
@@ -143,11 +165,13 @@ export default function MultiActionAreaCard({ NFT }) {
                     BUSD
                   </Typography>
                 </Stack>
-                {NFTData !== null && context.walletAddress !== process.env.REACT_APP_DAVIDE_WALLET && !NFTData[0] ?
-                  (<Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => {resellNFT(NFTData.tokenId)}} >Resell</Button>)
-                  : NFTData !== null && context.walletAddress !== process.env.REACT_APP_DAVIDE_WALLET && NFTData[0] &&
-                  (<Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => {cancelResellNFT(NFTData.tokenId)}} >Cancel Resell</Button>)
-                }
+                <Stack direction="row" spacing={2} sx={{ pt: 2 }}  alignItems={'center'} justifyContent={'center'}>
+                  {NFTData !== null && context.walletAddress !== process.env.REACT_APP_DAVIDE_WALLET && !NFTData[0] ?
+                    (<Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => {resellNFT(NFTData.tokenId)}} >Resell</Button>)
+                    : NFTData !== null && context.walletAddress !== process.env.REACT_APP_DAVIDE_WALLET && NFTData[0] &&
+                    (<Button variant="contained" sx={{ border: '1px solid black' }} onClick={() => {cancelResellNFT(NFTData.tokenId)}} >Cancel Resell</Button>)
+                  }
+                </Stack>
               </CardContent>
             </Stack>
           </CardActions>

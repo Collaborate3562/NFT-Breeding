@@ -78,6 +78,12 @@ function MenuDesktopItem({ item, isHome, isOpen, isOffset, onOpen, onClose }) {
       })
       return;
     }
+    if(context.networkId !== Number(process.env.REACT_APP_TEST_NETWORK_ID)) {
+      enqueueSnackbar("Please select Binance Smart Chain Testnet.", {
+        variant: "error"
+      })
+      return;
+    }
     navigate(path);
   }
 
